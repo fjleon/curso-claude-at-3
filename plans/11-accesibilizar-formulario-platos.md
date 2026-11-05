@@ -81,7 +81,7 @@ se graba un vídeo con Playwright del recorrido completo usando solo el teclado.
 - [x] **T11** — Validación al enviar: `errors = signal<{ name?: string; price?: string }>({})`, función `validate()` (nombre obligatorio, precio > 0); si hay errores no llama al store, muestra resumen `role="alert"` con enlaces/listado y mueve el foco al primer campo inválido (`dish-form.component.ts`) · ~10 min
 - [x] **T12** — Mensajes por campo: `<p id="name-error">` / `<p id="price-error">` enlazados con `aria-describedby` y `[attr.aria-invalid]`; limpiar el error del campo al corregirlo; `.alert-error` de la API con `role="alert"` (`dish-form.component.html`) · ~10 min
 - [x] **T13** — Estilos: borrar `.fake-*`, estilo de `.field-error` y `.form-control[aria-invalid="true"]` (no solo color: icono o texto), `:focus-visible` en `.back-link` y `.chip-remove`, reset de botón en chips con área táctil ≥ 24×24 px (WCAG 2.5.8) (`dish-form.component.css`) · ~10 min
-- [ ] **T14** — Verificar que el modo edición sigue funcionando (cargar plato, modificar, guardar) y que `npm run build -w @resttek/web-admin` compila sin errores · ~5 min
+- [x] **T14** — Verificar que el modo edición sigue funcionando (cargar plato, modificar, guardar) y que `npm run build -w @resttek/web-admin` compila sin errores · ~5 min
 - [ ] **T15** — Ejecutar `npm run seed` y `npm run e2e -w @resttek/web-admin` hasta verde; revisar el vídeo generado (foco visible en cada paso, errores visibles, plato en la lista) y guardarlo en `e2e/videos/` · ~10 min
 - [ ] **T16** — Pasada manual con teclado y comprobación rápida con lector de pantalla (NVDA/Narrador) del orden de tabulación y los anuncios; ejecutar `npm test` para confirmar que la API no se ha visto afectada · ~10 min
 

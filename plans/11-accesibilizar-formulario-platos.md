@@ -2,7 +2,7 @@
 
 - **Tipo:** bugfix
 - **Fecha:** 2026-11-05
-- **Estado:** En curso
+- **Estado:** Implementado
 
 ## Objetivo
 
@@ -90,13 +90,13 @@ se graba un vídeo con Playwright del recorrido completo usando solo el teclado.
 
 ## Criterios de aceptación
 
-- [ ] Dado el formulario «Nuevo plato», cuando se navega con Tab, entonces el orden es: volver → nombre → precio → categoría → disponible → descripción → selector de ingrediente → cantidad → añadir → (quitar de cada chip) → Cancelar → Guardar, y cada elemento enfocado muestra un indicador de foco visible.
-- [ ] Todos los campos tienen nombre accesible: `getByLabel()` de Playwright localiza nombre, precio, categoría, disponible, descripción, ingrediente y cantidad; los botones solo-icono tienen `aria-label`.
-- [ ] Dado un ingrediente añadido, cuando se activa «Quitar <ingrediente>» con Enter o Espacio, entonces desaparece, se anuncia en la región live y el foco no se pierde (va al siguiente botón de quitar o al selector).
-- [ ] Dado el formulario con nombre vacío y precio 0, cuando se pulsa Enter o se activa Guardar, entonces no se llama a la API, aparece un resumen con `role="alert"`, los campos inválidos tienen `aria-invalid="true"` y mensaje asociado por `aria-describedby`, y el foco está en el campo «Nombre del plato».
-- [ ] Dado el formulario completo y válido, cuando se envía con teclado, entonces se navega a la lista de platos y la fila del nuevo plato aparece en la tabla.
-- [ ] `npm run e2e -w @resttek/web-admin` pasa y genera `packages/web-admin/e2e/videos/dish-form-keyboard.webm`, donde se ve: modificación de datos, alta y baja de ingredientes, envío incompleto con errores y creación correcta del plato visible en la lista, todo manejado solo con el teclado.
-- [ ] `npm run build -w @resttek/web-admin` compila y `npm test` (Vitest de la API) sigue pasando.
+- [x] Dado el formulario «Nuevo plato», cuando se navega con Tab, entonces el orden es: volver → nombre → precio → categoría → disponible → descripción → selector de ingrediente → cantidad → añadir → (quitar de cada chip) → Cancelar → Guardar, y cada elemento enfocado muestra un indicador de foco visible.
+- [x] Todos los campos tienen nombre accesible: `getByLabel()` de Playwright localiza nombre, precio, categoría, disponible, descripción, ingrediente y cantidad; los botones solo-icono tienen `aria-label`.
+- [x] Dado un ingrediente añadido, cuando se activa «Quitar <ingrediente>» con Enter o Espacio, entonces desaparece, se anuncia en la región live y el foco no se pierde (va al siguiente botón de quitar o al selector).
+- [x] Dado el formulario con nombre vacío y precio 0, cuando se pulsa Enter o se activa Guardar, entonces no se llama a la API, aparece un resumen con `role="alert"`, los campos inválidos tienen `aria-invalid="true"` y mensaje asociado por `aria-describedby`, y el foco está en el campo «Nombre del plato».
+- [x] Dado el formulario completo y válido, cuando se envía con teclado, entonces se navega a la lista de platos y la fila del nuevo plato aparece en la tabla.
+- [x] `npm run e2e -w @resttek/web-admin` pasa y genera `packages/web-admin/e2e/videos/dish-form-keyboard.webm`, donde se ve: modificación de datos, alta y baja de ingredientes, envío incompleto con errores y creación correcta del plato visible en la lista, todo manejado solo con el teclado.
+- [x] `npm run build -w @resttek/web-admin` compila y `npm test` (Vitest de la API) sigue pasando.
 
 ## Dudas y decisiones
 

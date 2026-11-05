@@ -63,7 +63,8 @@ textarea.form-control {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 14px;
+  margin-top: 14px;
+  list-style: none;
 }
 
 .ingredient-chip {
@@ -98,7 +99,7 @@ textarea.form-control {
   align-items: flex-end;
 }
 
-.add-ingredient-row select {
+.ingredient-select {
   flex: 1;
 }
 

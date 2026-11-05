@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core'
+import { afterNextRender, Component, ElementRef, inject, Injector, OnInit, signal, viewChild, viewChildren } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router, RouterLink } from '@angular/router'
 import { LucideAngularModule } from 'lucide-angular'
@@ -21,6 +21,10 @@ export class DishFormComponent implements OnInit {
   readonly ingredientStore = inject(IngredientStore)
   private readonly route = inject(ActivatedRoute)
   private readonly router = inject(Router)
+  private readonly injector = inject(Injector)
+
+  private readonly ingredientSelect = viewChild.required<ElementRef<HTMLSelectElement>>('ingredientSelect')
+  private readonly removeButtons = viewChildren<ElementRef<HTMLButtonElement>>('removeButton')
 
   isEditing = false
   dishId: string | null = null
@@ -118,11 +122,23 @@ export class DishFormComponent implements OnInit {
     this.announcement.set(`${this.getIngredientName(this.newIngredientId)} añadido`)
     this.newIngredientId = ''
     this.newIngredientQty = 1
+    // El foco vuelve al selector para poder añadir otro ingrediente.
+    this.ingredientSelect().nativeElement.focus()
   }
 
   removeIngredient(ingredientId: string): void {
+    const index = this.form.ingredients.findIndex(i => i.ingredientId === ingredientId)
     this.form.ingredients = this.form.ingredients.filter(i => i.ingredientId !== ingredientId)
     this.announcement.set(`${this.getIngredientName(ingredientId)} quitado`)
+    // El botón enfocado desaparece: tras renderizar, el foco pasa al botón
+    // «Quitar» siguiente (o al anterior) y, si no quedan, al selector.
+    afterNextRender(() => this.focusAfterRemoval(index), { injector: this.injector })
+  }
+
+  private focusAfterRemoval(removedIndex: number): void {
+    const buttons = this.removeButtons()
+    const target = buttons[Math.min(removedIndex, buttons.length - 1)]
+    ;(target?.nativeElement ?? this.ingredientSelect().nativeElement).focus()
   }
 
   private validateNewIngredient(): string | null {

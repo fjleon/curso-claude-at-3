@@ -53,7 +53,7 @@
       <div class="add-ingredient-row">
         <div class="form-group ingredient-select">
           <label for="new-ingredient">Ingrediente</label>
-          <select id="new-ingredient" class="form-control" [(ngModel)]="newIngredientId" name="newIngredientId"
+          <select #ingredientSelect id="new-ingredient" class="form-control" [(ngModel)]="newIngredientId" name="newIngredientId"
             [attr.aria-invalid]="ingredientError() ? 'true' : null"
             [attr.aria-describedby]="ingredientError() ? 'ingredient-error' : null">
             <option value="">Seleccionar ingrediente</option>
@@ -84,7 +84,7 @@
           @for (ing of form.ingredients; track ing.ingredientId) {
             <li class="ingredient-chip">
               <span>{{ getIngredientName(ing.ingredientId) }} — {{ ing.quantity }}</span>
-              <button type="button" class="chip-remove" [attr.aria-label]="'Quitar ' + getIngredientName(ing.ingredientId)" (click)="removeIngredient(ing.ingredientId)">
+              <button #removeButton type="button" class="chip-remove" [attr.aria-label]="'Quitar ' + getIngredientName(ing.ingredientId)" (click)="removeIngredient(ing.ingredientId)">
                 <lucide-icon name="trash-2" [size]="12" aria-hidden="true"></lucide-icon>
               </button>
             </li>

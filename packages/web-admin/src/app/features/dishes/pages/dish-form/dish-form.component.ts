@@ -1,4 +1,4 @@
-import { afterNextRender, Component, ElementRef, inject, Injector, OnInit, signal, viewChild, viewChildren } from '@angular/core'
+import { afterNextRender, Component, computed, ElementRef, inject, Injector, OnInit, signal, viewChild, viewChildren } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router, RouterLink } from '@angular/router'
 import { LucideAngularModule } from 'lucide-angular'
@@ -7,6 +7,11 @@ import { DishStore } from '../../store/dish.store'
 import { DishService } from '../../services/dish.service'
 import { IngredientStore } from '../../../ingredients/store/ingredient.store'
 import type { CreateDishDto, DishCategory } from '../../models/dish.model'
+
+interface FormErrors {
+  name?: string
+  price?: string
+}
 
 @Component({
   selector: 'app-dish-form',
@@ -23,6 +28,8 @@ export class DishFormComponent implements OnInit {
   private readonly router = inject(Router)
   private readonly injector = inject(Injector)
 
+  private readonly nameInput = viewChild.required<ElementRef<HTMLInputElement>>('nameInput')
+  private readonly priceInput = viewChild.required<ElementRef<HTMLInputElement>>('priceInput')
   private readonly ingredientSelect = viewChild.required<ElementRef<HTMLSelectElement>>('ingredientSelect')
   private readonly removeButtons = viewChildren<ElementRef<HTMLButtonElement>>('removeButton')
 
@@ -31,6 +38,8 @@ export class DishFormComponent implements OnInit {
   restaurantId: string = ''
   loading = signal(false)
   error = signal<string | null>(null)
+  errors = signal<FormErrors>({})
+  readonly errorList = computed(() => Object.values(this.errors()).filter((e): e is string => !!e))
 
   categories: DishCategory[] = ['entrante', 'principal', 'postre', 'bebida']
 
@@ -155,8 +164,28 @@ export class DishFormComponent implements OnInit {
     return ingredient ? `${ingredient.name} (${ingredient.unit})` : ingredientId
   }
 
+  private validate(): FormErrors {
+    const errors: FormErrors = {}
+    if (!this.form.name?.trim()) {
+      errors.name = 'El nombre del plato es obligatorio.'
+    }
+    if (!(Number(this.form.price) > 0)) {
+      errors.price = 'El precio debe ser mayor que 0.'
+    }
+    return errors
+  }
+
   async onSubmit(): Promise<void> {
     this.error.set(null)
+    const errors = this.validate()
+    this.errors.set(errors)
+    if (errors.name || errors.price) {
+      // El resumen (role="alert") se anuncia y el foco va al primer campo inválido.
+      const firstInvalid = errors.name ? this.nameInput() : this.priceInput()
+      firstInvalid.nativeElement.focus()
+      return
+    }
+
     this.loading.set(true)
     try {
       if (this.isEditing && this.dishId) {

@@ -75,6 +75,13 @@ input, select, textarea {
   border: 1px solid transparent;
 }
 
+/* Foco visible al navegar con teclado (WCAG 2.4.7). El offset deja el anillo
+   sobre el fondo de la tarjeta para que contraste también en .btn-primary. */
+.btn:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
 .btn-primary {
   background: var(--green-medium);
   color: #0c0e14;
@@ -109,6 +116,19 @@ input, select, textarea {
 .btn-sm {
   padding: 6px 14px;
   font-size: 13px;
+}
+
+/* Oculta visualmente un elemento pero lo mantiene para lectores de pantalla. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .form-group {

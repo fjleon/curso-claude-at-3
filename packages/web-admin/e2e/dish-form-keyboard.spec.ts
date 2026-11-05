@@ -156,6 +156,8 @@ test('el formulario de platos se completa y envía solo con el teclado', async (
   await expect(price).toHaveAccessibleDescription(/mayor que 0/i)
   await expect(name).toBeFocused()
   await expect(page).toHaveURL(/\/dishes\/new$/)
+  // Pausa para que los errores se vean en el vídeo.
+  await page.waitForTimeout(2000)
 
   // 6. Corregir y guardar con el botón «Guardar».
   await page.keyboard.type(dishName)

@@ -47,6 +47,12 @@ async function reemplazar_texto(page: Page, text: string): Promise<void> {
   await page.keyboard.type(text)
 }
 
+async function expect_oculto_visualmente(locator: Locator): Promise<void> {
+  const box = await locator.boundingBox()
+  expect(box, 'el elemento debe existir en el DOM').not.toBeNull()
+  expect(box!.width * box!.height).toBeLessThanOrEqual(1)
+}
+
 async function texto_seleccionado(select: Locator): Promise<string> {
   return select.evaluate(el => (el as HTMLSelectElement).selectedOptions[0]?.text ?? '')
 }
@@ -76,6 +82,9 @@ test('el formulario de platos se completa y envía solo con el teclado', async (
   await expect(cancel).toBeVisible()
   await expect(save).toBeVisible()
   await expect(save).toHaveAttribute('type', 'submit')
+  // Textos solo para lectores de pantalla: presentes pero ocultos visualmente.
+  await expect_oculto_visualmente(page.locator('label[for="new-ingredient-qty"]'))
+  await expect_oculto_visualmente(liveRegion)
 
   // --- A partir de aquí, solo teclado ---
   // Punto de partida: el primer campo del formulario.
@@ -156,11 +165,15 @@ test('el formulario de platos se completa y envía solo con el teclado', async (
   await expect(price).not.toHaveAttribute('aria-invalid', 'true')
   await mover_foco_hasta(page, 'Tab', cancel)
   await pulsar_y_enfocar(page, 'Tab', save)
+  await expect(save).toHaveCSS('outline-style', 'solid')
   await page.keyboard.press('Enter')
 
-  // 7. El plato aparece en la lista.
+  // 7. El plato aparece en la lista (End baja hasta el final, donde se añade).
   await expect(page).toHaveURL(/\/dishes$/)
-  await expect(page.getByRole('cell', { name: new RegExp(dishName) })).toBeVisible()
+  const newDish = page.getByRole('cell', { name: new RegExp(dishName) })
+  await expect(newDish).toBeVisible()
+  await page.keyboard.press('End')
+  await expect(newDish).toBeInViewport()
 
   // Pausa final para que el resultado se vea en el vídeo.
   await page.waitForTimeout(1500)

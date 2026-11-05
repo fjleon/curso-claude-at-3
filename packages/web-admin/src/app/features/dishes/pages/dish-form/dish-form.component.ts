@@ -41,6 +41,9 @@ export class DishFormComponent implements OnInit {
 
   newIngredientId = ''
   newIngredientQty = 1
+  ingredientError = signal<string | null>(null)
+  /** Mensaje para lectores de pantalla (región aria-live). */
+  announcement = signal('')
 
   get pageTitle(): string {
     return this.isEditing ? 'Editar plato' : 'Nuevo plato'
@@ -94,21 +97,41 @@ export class DishFormComponent implements OnInit {
     }
   }
 
+  /** Enter en la cantidad añade el ingrediente en lugar de enviar el formulario. */
+  onQuantityEnter(event: Event): void {
+    event.preventDefault()
+    this.addIngredient()
+  }
+
   addIngredient(): void {
-    if (!this.newIngredientId || this.newIngredientQty <= 0) return
-    const exists = this.form.ingredients.find(i => i.ingredientId === this.newIngredientId)
-    if (exists) return
+    const error = this.validateNewIngredient()
+    this.ingredientError.set(error)
+    if (error) {
+      this.announcement.set(error)
+      return
+    }
 
     this.form.ingredients = [
       ...this.form.ingredients,
       { ingredientId: this.newIngredientId, quantity: this.newIngredientQty }
     ]
+    this.announcement.set(`${this.getIngredientName(this.newIngredientId)} añadido`)
     this.newIngredientId = ''
     this.newIngredientQty = 1
   }
 
   removeIngredient(ingredientId: string): void {
     this.form.ingredients = this.form.ingredients.filter(i => i.ingredientId !== ingredientId)
+    this.announcement.set(`${this.getIngredientName(ingredientId)} quitado`)
+  }
+
+  private validateNewIngredient(): string | null {
+    if (!this.newIngredientId) return 'Selecciona un ingrediente.'
+    if (!(this.newIngredientQty > 0)) return 'La cantidad debe ser mayor que 0.'
+    if (this.form.ingredients.some(i => i.ingredientId === this.newIngredientId)) {
+      return 'Ese ingrediente ya está añadido.'
+    }
+    return null
   }
 
   getIngredientName(ingredientId: string): string {

@@ -53,7 +53,9 @@
       <div class="add-ingredient-row">
         <div class="form-group ingredient-select">
           <label for="new-ingredient">Ingrediente</label>
-          <select id="new-ingredient" class="form-control" [(ngModel)]="newIngredientId" name="newIngredientId">
+          <select id="new-ingredient" class="form-control" [(ngModel)]="newIngredientId" name="newIngredientId"
+            [attr.aria-invalid]="ingredientError() ? 'true' : null"
+            [attr.aria-describedby]="ingredientError() ? 'ingredient-error' : null">
             <option value="">Seleccionar ingrediente</option>
             @for (i of ingredientStore.ingredients(); track i.id) {
               <option [value]="i.id">{{ i.name }} ({{ i.unit }})</option>
@@ -62,12 +64,20 @@
         </div>
         <div class="form-group">
           <label for="new-ingredient-qty" class="visually-hidden">Cantidad</label>
-          <input id="new-ingredient-qty" type="number" class="form-control qty-input" [(ngModel)]="newIngredientQty" name="newIngredientQty" min="0" step="any" placeholder="Cant." />
+          <input id="new-ingredient-qty" type="number" class="form-control qty-input" [(ngModel)]="newIngredientQty" name="newIngredientQty" min="0" step="any" placeholder="Cant."
+            [attr.aria-describedby]="ingredientError() ? 'ingredient-error' : null"
+            (keydown.enter)="onQuantityEnter($event)" />
         </div>
         <button type="button" class="btn btn-secondary btn-sm" aria-label="Añadir ingrediente" (click)="addIngredient()">
           <lucide-icon name="plus" [size]="14" aria-hidden="true"></lucide-icon>
         </button>
       </div>
+
+      @if (ingredientError()) {
+        <p id="ingredient-error" class="field-error">{{ ingredientError() }}</p>
+      }
+
+      <div class="visually-hidden" aria-live="polite">{{ announcement() }}</div>
 
       @if (form.ingredients.length > 0) {
         <ul class="ingredient-chips" aria-label="Ingredientes añadidos">

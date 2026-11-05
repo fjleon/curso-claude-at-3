@@ -1,0 +1,22 @@
+# Dependencias
+node_modules/
+
+# Builds y cachés
+dist/
+out-tsc/
+.angular/
+
+# Base de datos local (se regenera con npm run seed)
+*.db
+*.db-journal
+
+# Entorno
+.env
+.env.*
+
+# Claude Code (ajustes locales)
+.claude/settings.local.json
+
+# Sistema
+.DS_Store
+Thumbs.db

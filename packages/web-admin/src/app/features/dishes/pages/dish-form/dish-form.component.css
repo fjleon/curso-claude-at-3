@@ -4,6 +4,12 @@
   gap: 10px;
 }
 
+.header-back h1 {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 .back-link {
   color: var(--text-muted);
   display: flex;
@@ -36,20 +42,54 @@ textarea.form-control {
   min-height: 80px;
 }
 
-.ingredients-section {
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border-color);
-}
-
-.header-back h1 {
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--text-primary);
+select.form-control {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b92a8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
 }
 
 .required-mark {
   color: var(--red);
+}
+
+/* --- Errores de validación --- */
+
+.error-summary {
+  margin-bottom: 20px;
+}
+
+.error-summary ul {
+  margin: 6px 0 0 18px;
+}
+
+/* Además del color, el campo inválido lleva borde más grueso y un mensaje
+   de texto con icono (WCAG 1.4.1: no depender solo del color). */
+.form-control[aria-invalid="true"] {
+  border-color: var(--red);
+  border-width: 2px;
+}
+
+.form-control[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px var(--red-glow);
+}
+
+.field-error {
+  font-size: 13px;
+  color: #f87171;
+}
+
+.field-error::before {
+  content: "⚠ ";
+}
+
+/* --- Ingredientes --- */
+
+.ingredients-section {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
 }
 
 .ingredients-section h2 {
@@ -57,40 +97,6 @@ textarea.form-control {
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 14px;
-}
-
-.ingredient-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 14px;
-  list-style: none;
-}
-
-.ingredient-chip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  background: var(--bg-hover);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.chip-remove {
-  background: transparent;
-  color: var(--text-muted);
-  padding: 2px;
-  border-radius: 50%;
-  transition: all var(--transition);
-  display: flex;
-}
-
-.chip-remove:hover {
-  color: var(--red);
-  background: var(--red-glow);
 }
 
 .add-ingredient-row {
@@ -107,6 +113,60 @@ textarea.form-control {
   width: 90px;
 }
 
+.add-ingredient-row .btn {
+  min-height: 42px;
+}
+
+.ingredient-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  list-style: none;
+}
+
+.ingredient-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px 4px 12px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Botón de quitar: reset del estilo nativo y área mínima de 24×24 px (WCAG 2.5.8). */
+.chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.chip-remove:hover {
+  color: var(--red);
+  background: var(--red-glow);
+}
+
+/* --- Foco visible (WCAG 2.4.7) --- */
+
+.back-link:focus-visible,
+.chip-remove:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* --- Acciones --- */
+
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -116,33 +176,11 @@ textarea.form-control {
   border-top: 1px solid var(--border-color);
 }
 
-select.form-control {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b92a8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 32px;
-}
-
-.fake-title {
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.fake-label {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-.fake-subtitle {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 14px;
-}
-
-.btn, .chip-remove {
+.btn {
   cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

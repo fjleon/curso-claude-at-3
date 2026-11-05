@@ -129,6 +129,8 @@ test('el formulario de platos se completa y envía solo con el teclado', async (
   await expect(ingredientList).not.toContainText(firstIngredient)
   await expect(liveRegion).toContainText('quitado')
   await expect(removeSecond).toBeFocused()
+  // Foco visible: el botón enfocado muestra un contorno.
+  await expect(removeSecond).toHaveCSS('outline-style', 'solid')
 
   // 5. Enviar el formulario incompleto (nombre vacío y precio 0).
   await mover_foco_hasta(page, 'Shift+Tab', name)

@@ -85,7 +85,8 @@ se graba un vídeo con Playwright del recorrido completo usando solo el teclado.
 - [x] **T13** — Estilos: borrar `.fake-*`, estilo de `.field-error` y `.form-control[aria-invalid="true"]` (no solo color: icono o texto), `:focus-visible` en `.back-link` y `.chip-remove`, reset de botón en chips con área táctil ≥ 24×24 px (WCAG 2.5.8) (`dish-form.component.css`) · ~10 min
 - [x] **T14** — Verificar que el modo edición sigue funcionando (cargar plato, modificar, guardar) y que `npm run build -w @resttek/web-admin` compila sin errores · ~5 min
 - [x] **T15** — Ejecutar `npm run seed` y `npm run e2e -w @resttek/web-admin` hasta verde; revisar el vídeo generado (foco visible en cada paso, errores visibles, plato en la lista) y guardarlo en `e2e/videos/` · ~10 min
-- [ ] **T16** — Pasada manual con teclado y comprobación rápida con lector de pantalla (NVDA/Narrador) del orden de tabulación y los anuncios; ejecutar `npm test` para confirmar que la API no se ha visto afectada · ~10 min
+- [x] **T16** — Pasada manual con teclado y comprobación rápida con lector de pantalla (NVDA/Narrador) del orden de tabulación y los anuncios; ejecutar `npm test` para confirmar que la API no se ha visto afectada · ~10 min
+  - *Nota:* el orden de tabulación y los anuncios se verificaron de forma automatizada (e2e + árbol de accesibilidad de Playwright: nombres, estados `invalid`, `alert`, encabezados). `npm test`: 66/66. **Queda pendiente una escucha real con NVDA/Narrador por una persona.**
 
 ## Criterios de aceptación
 

@@ -164,6 +164,12 @@ export class DishFormComponent implements OnInit {
     return ingredient ? `${ingredient.name} (${ingredient.unit})` : ingredientId
   }
 
+  /** Al corregir un campo se retira su error (se vuelve a validar al enviar). */
+  clearError(field: keyof FormErrors): void {
+    if (!this.errors()[field]) return
+    this.errors.update(({ [field]: _removed, ...rest }) => rest)
+  }
+
   private validate(): FormErrors {
     const errors: FormErrors = {}
     if (!this.form.name?.trim()) {

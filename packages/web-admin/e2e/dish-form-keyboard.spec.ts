@@ -72,6 +72,11 @@ test('el formulario de platos se completa y envía solo con el teclado', async (
   const ingredientList = page.getByRole('list', { name: 'Ingredientes añadidos' })
   const liveRegion = page.locator('[aria-live="polite"]')
 
+  await expect(page.getByRole('link', { name: 'Volver a la lista de platos' })).toBeVisible()
+  await expect(cancel).toBeVisible()
+  await expect(save).toBeVisible()
+  await expect(save).toHaveAttribute('type', 'submit')
+
   // --- A partir de aquí, solo teclado ---
   // Punto de partida: el primer campo del formulario.
   await name.focus()

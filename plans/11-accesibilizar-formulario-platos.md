@@ -2,7 +2,7 @@
 
 - **Tipo:** bugfix
 - **Fecha:** 2026-11-05
-- **Estado:** Propuesto
+- **Estado:** En curso
 
 ## Objetivo
 
@@ -68,7 +68,7 @@ se graba un vídeo con Playwright del recorrido completo usando solo el teclado.
 
 > Cada tarea debe llevar entre 5 y 10 minutos.
 
-- [ ] **T1** — Instalar Playwright en web-admin: `npm i -D @playwright/test -w @resttek/web-admin`, `npx playwright install chromium`, script `"e2e": "playwright test"` y entradas en `.gitignore` (`packages/web-admin/package.json`, `.gitignore`) · ~5 min
+- [x] **T1** — Instalar Playwright en web-admin: `npm i -D @playwright/test -w @resttek/web-admin`, `npx playwright install chromium`, script `"e2e": "playwright test"` y entradas en `.gitignore` (`packages/web-admin/package.json`, `.gitignore`) · ~5 min
 - [ ] **T2** — Crear `playwright.config.ts`: `testDir: 'e2e'`, `baseURL: http://localhost:4200`, Chromium, `viewport 1280x800`, `video: { mode: 'on', size: 1280x800 }`, `launchOptions.slowMo: 300`, `webServer` con `npm run dev:api` (url `http://localhost:3000/health`) y `npm run dev:admin` (url `http://localhost:4200`), `reuseExistingServer: true`, `cwd` en la raíz (`packages/web-admin/playwright.config.ts`) · ~10 min
 - [ ] **T3** — Test e2e en rojo, parte 1: login con `admin@resttek.com`, navegación por la UI hasta restaurante → Platos → «Nuevo plato», y comprobaciones de accesibilidad básicas: `getByLabel('Nombre del plato')`, `getByLabel('Precio (€)')`, `getByRole('button', { name: 'Guardar' })` y `getByRole('heading', { level: 1, name: 'Nuevo plato' })` (`packages/web-admin/e2e/dish-form-keyboard.spec.ts`) · ~10 min
 - [ ] **T4** — Test e2e en rojo, parte 2: recorrido solo con `page.keyboard` (Tab/Shift+Tab, flechas en selects, Enter/Espacio): rellenar y modificar datos, añadir dos ingredientes, quitar uno, enviar incompleto (nombre vacío y precio 0) y comprobar `role="alert"`, `aria-invalid="true"` y foco en el primer campo inválido; corregir, enviar y comprobar el plato en la tabla de la lista. Al final `page.video().saveAs('e2e/videos/dish-form-keyboard.webm')` (nombre del plato con sufijo `Date.now()` para que sea repetible) · ~10 min

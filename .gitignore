@@ -10,6 +10,11 @@ out-tsc/
 *.db
 *.db-journal
 
+# Playwright (salida temporal; los vídeos de evidencia van en e2e/videos/)
+test-results/
+playwright-report/
+blob-report/
+
 # Entorno
 .env
 .env.*

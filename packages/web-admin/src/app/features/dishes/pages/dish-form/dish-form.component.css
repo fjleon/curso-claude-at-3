@@ -42,7 +42,17 @@ textarea.form-control {
   border-top: 1px solid var(--border-color);
 }
 
-.ingredients-section h3 {
+.header-back h1 {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.required-mark {
+  color: var(--red);
+}
+
+.ingredients-section h2 {
   font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);

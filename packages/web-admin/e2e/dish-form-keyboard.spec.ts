@@ -34,6 +34,7 @@ async function pulsar_y_enfocar(page: Page, key: string, target: Locator): Promi
 
 /** Pulsa la tecla repetidamente hasta que el foco llegue al elemento (máx. `max` veces). */
 async function mover_foco_hasta(page: Page, key: string, target: Locator, max = 15): Promise<void> {
+  await expect(target).toBeVisible()
   for (let i = 0; i < max; i++) {
     if (await target.evaluate(el => el === document.activeElement)) return
     await page.keyboard.press(key)

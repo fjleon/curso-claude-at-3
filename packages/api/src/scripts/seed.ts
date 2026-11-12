@@ -29,6 +29,18 @@ const seed = async () => {
             console.log('Admin already exists.')
         }
 
+        await dbConfig.run(`
+            INSERT OR IGNORE INTO restaurants (id, name, address, email, phone, owner_first_name, owner_last_name, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, ['rest-1', 'Restaurante El Gourmet', 'Calle Mayor 10, Madrid', 'info@gourmet.com', '912345678', 'Carlos', 'García', new Date().toISOString(), new Date().toISOString()])
+
+        await dbConfig.run(`
+            INSERT OR IGNORE INTO restaurants (id, name, address, email, phone, owner_first_name, owner_last_name, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, ['rest-2', 'Pizzería Napoli', 'Avenida del Sol 25, Barcelona', 'info@napoli.com', '934567890', 'Marco', 'Rossi', new Date().toISOString(), new Date().toISOString()])
+
+        console.log('Restaurants created.')
+
         const employees = [
             { firstName: 'Juan', lastName: 'García', email: 'cocinero1@resttek.com', role: 'cocinero', restaurantId: 'rest-1' },
             { firstName: 'María', lastName: 'López', email: 'camarero1@resttek.com', role: 'camarero', restaurantId: 'rest-1' },
@@ -59,17 +71,27 @@ const seed = async () => {
             }
         }
 
-        await dbConfig.run(`
-            INSERT OR IGNORE INTO restaurants (id, name, address, email, phone, owner_first_name, owner_last_name, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, ['rest-1', 'Restaurante El Gourmet', 'Calle Mayor 10, Madrid', 'info@gourmet.com', '912345678', 'Carlos', 'García', new Date().toISOString(), new Date().toISOString()])
 
-        await dbConfig.run(`
-            INSERT OR IGNORE INTO restaurants (id, name, address, email, phone, owner_first_name, owner_last_name, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, ['rest-2', 'Pizzería Napoli', 'Avenida del Sol 25, Barcelona', 'info@napoli.com', '934567890', 'Marco', 'Rossi', new Date().toISOString(), new Date().toISOString()])
+        const tables: Array<{ restaurantId: string, number: number, capacity: number, status: string, description: string | null }> = [
+            { restaurantId: 'rest-1', number: 1, capacity: 2, status: 'libre', description: 'Junto a la ventana' },
+            { restaurantId: 'rest-1', number: 2, capacity: 2, status: 'libre', description: null },
+            { restaurantId: 'rest-1', number: 3, capacity: 4, status: 'libre', description: null },
+            { restaurantId: 'rest-1', number: 4, capacity: 4, status: 'libre', description: 'Terraza' },
+            { restaurantId: 'rest-1', number: 5, capacity: 6, status: 'ocupada', description: null },
+            { restaurantId: 'rest-1', number: 6, capacity: 8, status: 'libre', description: 'Mesa grande' },
+            { restaurantId: 'rest-2', number: 1, capacity: 2, status: 'libre', description: null },
+            { restaurantId: 'rest-2', number: 2, capacity: 4, status: 'libre', description: null },
+            { restaurantId: 'rest-2', number: 3, capacity: 6, status: 'libre', description: 'Terraza' }
+        ]
+        for (const table of tables) {
+            const now = new Date().toISOString()
+            await dbConfig.run(`
+                INSERT OR IGNORE INTO restaurant_tables (id, restaurant_id, number, description, capacity, status, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            `, [`table-${table.restaurantId}-${table.number}`, table.restaurantId, table.number, table.description, table.capacity, table.status, now, now])
+        }
 
-        console.log('Restaurants created.')
+        console.log('Tables created: 6 in rest-1 and 3 in rest-2.')
 
         const ingredientsRest1 = [
             { id: randomUUID(), name: 'Tomate', unit: 'kg' },
@@ -162,7 +184,7 @@ const seed = async () => {
         await dbConfig.run(`
             INSERT OR IGNORE INTO orders (id, restaurant_id, table_id, client_id, created_at)
             VALUES (?, ?, ?, ?, ?)
-        `, [order1Id, 'rest-1', '5', null, new Date().toISOString()])
+        `, [order1Id, 'rest-1', 'table-rest-1-5', null, new Date().toISOString()])
 
         for (let i = 0; i < 2; i++) {
             await dbConfig.run(`

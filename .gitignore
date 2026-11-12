@@ -25,3 +25,6 @@ blob-report/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Worktrees de Claude Code
+.claude/worktrees/

@@ -56,13 +56,13 @@ jobs:
       - run: npm ci
       # web-shared es una librería sin build propio: se compila con cada app.
       - name: Build
-        run: npm run build -w @resttek/web-${{ matrix.app }}
+        run: npm run build -w @resttek/${{ matrix.app }}
       # Los frontends no tienen tests unitarios ni lint configurados; si se añaden
       # scripts "test" o "lint" a sus package.json, se ejecutarán aquí.
       - name: Tests (si existen)
-        run: npm run test -w @resttek/web-${{ matrix.app }} --if-present
+        run: npm run test -w @resttek/${{ matrix.app }} --if-present
       - name: Lint (si existe)
-        run: npm run lint -w @resttek/web-${{ matrix.app }} --if-present
+        run: npm run lint -w @resttek/${{ matrix.app }} --if-present
 
   docs-review:
     name: Revisión de coherencia con docs y OpenAPI (Claude)

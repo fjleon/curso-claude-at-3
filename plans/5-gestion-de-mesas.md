@@ -2,7 +2,7 @@
 
 - **Tipo:** feature
 - **Fecha:** 2026-11-12
-- **Estado:** En curso
+- **Estado:** Implementado
 
 ## Objetivo
 
@@ -154,22 +154,22 @@ de las mesas ocupadas.
 **Cierre**
 
 - [x] **T29** — Actualizar `docs/dominio/modelo-datos.md` (tabla `restaurant_tables`, relación con `orders.table_id`), `glosario.md` (Mesa y estados) y `docs/arquitectura/arquitectura-api.md` / `arquitectura-frontend.md` (endpoints, features nuevas, flujo del cliente) · ~10 min
-- [ ] **T30** — Comprobación final: `npm test`, `npx tsc --noEmit -p packages/api` y build de las tres apps; corregir avisos (no hay eslint/prettier configurados) · ~8 min
+- [x] **T30** — Comprobación final: `npm test`, `npx tsc --noEmit -p packages/api` y build de las tres apps; corregir avisos (no hay eslint/prettier configurados) · ~8 min
 
 ## Criterios de aceptación
 
-- [ ] Dado un admin, cuando hace `POST /api/v1/restaurants/rest-1/tables` con `{ number: 10, capacity: 4 }`, entonces recibe 201 con la mesa en estado `libre`; repetir el mismo número da 409 y una capacidad ≤ 0 da 400.
-- [ ] Dado un cocinero, cuando hace `POST`, `PUT` o `DELETE` sobre mesas, entonces recibe 403; `GET` y `PATCH .../status` le devuelven 200.
-- [ ] `GET .../tables/<id inexistente>` devuelve 404; `DELETE` de una mesa `ocupada` devuelve 409.
-- [ ] `PATCH .../tables/:id/status` con `{ status: "reservada" }` devuelve 200 y con `{ status: "rota" }` devuelve 400.
-- [ ] Dado un cliente logueado, `GET /api/v1/public/restaurants/rest-1/tables?people=3` devuelve solo mesas `libre` con `capacity >= 3`, ordenadas por capacidad; sin token devuelve 401 y con `people=0` devuelve 400.
-- [ ] `POST .../tables/:id/occupy` sobre una mesa libre devuelve 200 y la deja `ocupada`; una segunda llamada devuelve 409.
-- [ ] En `web-clientes`, al pulsar un restaurante se pide el nº de personas, se listan solo las mesas válidas, al continuar se va a la carta y el pedido creado tiene `tableId` de esa mesa.
-- [ ] En `web-admin` se pueden crear, listar, editar y borrar mesas desde el dashboard del restaurante.
-- [ ] En `web-empleados`, `/mesas` muestra todas las mesas con su estado, permite cambiarlo y en las ocupadas muestra sus pedidos activos (se refresca cada 30 s).
-- [ ] Tras `npm run seed`, `rest-1` tiene 6 mesas y el pedido de ejemplo aparece en la mesa nº 5.
-- [ ] Los tests de vitest relacionados pasan (`npm test`).
-- [ ] eslint no muestra errores y el código está formateado con prettier — **no aplica**: no hay eslint/prettier en el proyecto; se sustituye por `tsc --noEmit` y los builds de Angular sin errores.
+- [x] Dado un admin, cuando hace `POST /api/v1/restaurants/rest-1/tables` con `{ number: 10, capacity: 4 }`, entonces recibe 201 con la mesa en estado `libre`; repetir el mismo número da 409 y una capacidad ≤ 0 da 400.
+- [x] Dado un cocinero, cuando hace `POST`, `PUT` o `DELETE` sobre mesas, entonces recibe 403; `GET` y `PATCH .../status` le devuelven 200.
+- [x] `GET .../tables/<id inexistente>` devuelve 404; `DELETE` de una mesa `ocupada` devuelve 409.
+- [x] `PATCH .../tables/:id/status` con `{ status: "reservada" }` devuelve 200 y con `{ status: "rota" }` devuelve 400.
+- [x] Dado un cliente logueado, `GET /api/v1/public/restaurants/rest-1/tables?people=3` devuelve solo mesas `libre` con `capacity >= 3`, ordenadas por capacidad; sin token devuelve 401 y con `people=0` devuelve 400.
+- [x] `POST .../tables/:id/occupy` sobre una mesa libre devuelve 200 y la deja `ocupada`; una segunda llamada devuelve 409.
+- [ ] En `web-clientes`, al pulsar un restaurante se pide el nº de personas, se listan solo las mesas válidas, al continuar se va a la carta y el pedido creado tiene `tableId` de esa mesa. — *pendiente de prueba manual en navegador: verificado solo con el build de Angular y revisión del código contra el contrato.*
+- [ ] En `web-admin` se pueden crear, listar, editar y borrar mesas desde el dashboard del restaurante. — *pendiente de prueba manual en navegador: verificado solo con el build de Angular y revisión del código contra el contrato.*
+- [ ] En `web-empleados`, `/mesas` muestra todas las mesas con su estado, permite cambiarlo y en las ocupadas muestra sus pedidos activos (se refresca cada 30 s). — *pendiente de prueba manual en navegador: verificado solo con el build de Angular y revisión del código contra el contrato.*
+- [x] Tras `npm run seed`, `rest-1` tiene 6 mesas y el pedido de ejemplo aparece en la mesa nº 5.
+- [x] Los tests de vitest relacionados pasan (`npm test`).
+- [x] eslint no muestra errores y el código está formateado con prettier — **no aplica**: no hay eslint/prettier en el proyecto; se sustituye por `tsc --noEmit` y los builds de Angular sin errores.
 
 ## Dudas y decisiones
 

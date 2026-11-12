@@ -7,7 +7,8 @@ import {
     InvalidCapacityError,
     InvalidTableNumberError,
     InvalidTableStatusError,
-    RestaurantNotFoundError
+    RestaurantNotFoundError,
+    TableNotFoundError
 } from '@errors/DomainErrors.js'
 import type { Restaurant } from '@models/restaurant.model.js'
 
@@ -83,6 +84,80 @@ describe('TableService', () => {
         it('lanza RestaurantNotFoundError si el restaurante no existe', async () => {
             await expect(service.create({ restaurantId: 'no-existe', number: 1, capacity: 2 }))
                 .rejects.toThrow(RestaurantNotFoundError)
+        })
+    })
+
+    describe('findById', () => {
+        it('devuelve la mesa del restaurante', async () => {
+            const created = await service.create({ restaurantId: 'r1', number: 1, capacity: 2 })
+            expect(await service.findById('r1', created.id)).toEqual(created)
+        })
+
+        it('lanza TableNotFoundError si no existe', async () => {
+            await expect(service.findById('r1', 'no-existe')).rejects.toThrow(TableNotFoundError)
+        })
+
+        it('lanza TableNotFoundError si la mesa es de otro restaurante', async () => {
+            const created = await service.create({ restaurantId: 'r2', number: 1, capacity: 2 })
+            await expect(service.findById('r1', created.id)).rejects.toThrow(TableNotFoundError)
+        })
+    })
+
+    describe('findByRestaurantId', () => {
+        it('lista solo las mesas del restaurante ordenadas por número', async () => {
+            await service.create({ restaurantId: 'r1', number: 3, capacity: 2 })
+            await service.create({ restaurantId: 'r1', number: 1, capacity: 2 })
+            await service.create({ restaurantId: 'r2', number: 2, capacity: 2 })
+
+            const tables = await service.findByRestaurantId('r1')
+            expect(tables.map(t => t.number)).toEqual([1, 3])
+        })
+
+        it('devuelve [] si el restaurante no tiene mesas o no existe', async () => {
+            expect(await service.findByRestaurantId('no-existe')).toEqual([])
+        })
+    })
+
+    describe('update', () => {
+        it('reemplaza número, capacidad y descripción conservando el estado si no se envía', async () => {
+            const created = await service.create({ restaurantId: 'r1', number: 1, capacity: 2, description: 'Ventana', status: 'reservada' })
+
+            const updated = await service.update('r1', created.id, { number: 7, capacity: 6 })
+
+            expect(updated).toMatchObject({ id: created.id, restaurantId: 'r1', number: 7, capacity: 6, description: null, status: 'reservada', createdAt: created.createdAt })
+            expect(await tableRepo.findById(created.id)).toEqual(updated)
+        })
+
+        it('aplica el estado si se envía', async () => {
+            const created = await service.create({ restaurantId: 'r1', number: 1, capacity: 2 })
+            const updated = await service.update('r1', created.id, { number: 1, capacity: 2, status: 'OCUPADA' })
+            expect(updated.status).toBe('ocupada')
+        })
+
+        it('permite conservar el propio número', async () => {
+            const created = await service.create({ restaurantId: 'r1', number: 4, capacity: 2 })
+            const updated = await service.update('r1', created.id, { number: 4, capacity: 8, description: 'Grande' })
+            expect(updated).toMatchObject({ number: 4, capacity: 8, description: 'Grande' })
+        })
+
+        it('rechaza el número de otra mesa del restaurante', async () => {
+            await service.create({ restaurantId: 'r1', number: 1, capacity: 2 })
+            const other = await service.create({ restaurantId: 'r1', number: 2, capacity: 2 })
+            await expect(service.update('r1', other.id, { number: 1, capacity: 2 }))
+                .rejects.toThrow(DuplicatedTableNumberError)
+        })
+
+        it('valida número, capacidad y estado', async () => {
+            const created = await service.create({ restaurantId: 'r1', number: 1, capacity: 2 })
+            await expect(service.update('r1', created.id, { number: 0, capacity: 2 })).rejects.toThrow(InvalidTableNumberError)
+            await expect(service.update('r1', created.id, { number: 1, capacity: -1 })).rejects.toThrow(InvalidCapacityError)
+            await expect(service.update('r1', created.id, { number: 1, capacity: 2, status: 'rota' })).rejects.toThrow(InvalidTableStatusError)
+        })
+
+        it('lanza TableNotFoundError si no existe o es de otro restaurante', async () => {
+            const created = await service.create({ restaurantId: 'r2', number: 1, capacity: 2 })
+            await expect(service.update('r1', 'no-existe', { number: 1, capacity: 2 })).rejects.toThrow(TableNotFoundError)
+            await expect(service.update('r1', created.id, { number: 1, capacity: 2 })).rejects.toThrow(TableNotFoundError)
         })
     })
 })

@@ -7,11 +7,19 @@ import {
     DuplicatedTableNumberError,
     InvalidCapacityError,
     InvalidTableNumberError,
-    RestaurantNotFoundError
+    RestaurantNotFoundError,
+    TableNotFoundError
 } from '@errors/DomainErrors.js'
 
 export interface CreateTableDTO {
     restaurantId: string
+    number: number
+    capacity: number
+    description?: string | null
+    status?: string
+}
+
+export interface UpdateTableDTO {
     number: number
     capacity: number
     description?: string | null
@@ -52,6 +60,43 @@ export class TableService {
 
         await this.tableRepository.save(table)
         return table
+    }
+
+    async update(restaurantId: string, id: string, dto: UpdateTableDTO): Promise<Table> {
+        const existing = await this.findById(restaurantId, id)
+
+        const number = this.validateNumber(dto.number)
+        const capacity = this.validateCapacity(dto.capacity)
+        const status = dto.status === undefined ? existing.status : normalizeTableStatus(dto.status)
+
+        const sameNumber = await this.tableRepository.findByNumber(restaurantId, number)
+        if (sameNumber && sameNumber.id !== existing.id) {
+            throw new DuplicatedTableNumberError()
+        }
+
+        const updated: Table = {
+            ...existing,
+            number,
+            capacity,
+            description: this.normalizeDescription(dto.description),
+            status,
+            updatedAt: new Date().toISOString()
+        }
+
+        await this.tableRepository.save(updated)
+        return updated
+    }
+
+    async findById(restaurantId: string, id: string): Promise<Table> {
+        const table = await this.tableRepository.findById(id)
+        if (!table || table.restaurantId !== restaurantId) {
+            throw new TableNotFoundError()
+        }
+        return table
+    }
+
+    async findByRestaurantId(restaurantId: string): Promise<Table[]> {
+        return this.tableRepository.findByRestaurantId(restaurantId)
     }
 
     private validateNumber(value: unknown): number {

@@ -1,0 +1,116 @@
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.table-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-left-width: 5px;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.table-libre { border-left-color: #22c55e; }
+.table-ocupada { border-left-color: #ef4444; }
+.table-reservada { border-left-color: #f59e0b; }
+
+.table-header {
+  padding: 14px 16px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table-number {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.table-status {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.table-libre .table-status { color: #16a34a; }
+.table-ocupada .table-status { color: #dc2626; }
+.table-reservada .table-status { color: #d97706; }
+
+.table-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.table-capacity,
+.table-description {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.status-select {
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+.table-orders {
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.table-orders h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.order-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.order-id {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.no-orders {
+  font-size: 13px;
+  color: var(--text-secondary);
+}

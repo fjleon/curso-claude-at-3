@@ -1,4 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core'
+import { Table } from '../models/table.model'
 
 export interface Dish {
   id: string
@@ -21,9 +22,15 @@ export interface CartItem {
 export class CartStore {
   private readonly _items = signal<CartItem[]>([])
   private readonly _restaurantId = signal<string | null>(null)
+  private readonly _tableRestaurantId = signal<string | null>(null)
+  private readonly _tableId = signal<string | null>(null)
+  private readonly _tableNumber = signal<number | null>(null)
 
   readonly items = this._items.asReadonly()
   readonly restaurantId = this._restaurantId.asReadonly()
+  readonly tableRestaurantId = this._tableRestaurantId.asReadonly()
+  readonly tableId = this._tableId.asReadonly()
+  readonly tableNumber = this._tableNumber.asReadonly()
 
   readonly total = computed(() =>
     this._items().reduce((sum, item) => sum + item.dish.price * item.quantity, 0)
@@ -74,8 +81,27 @@ export class CartStore {
     this._items.set(items)
   }
 
+  setTable(restaurantId: string, table: Table): void {
+    if (this._restaurantId() && this._restaurantId() !== restaurantId) {
+      this._items.set([])
+      this._restaurantId.set(null)
+    }
+    this._tableRestaurantId.set(restaurantId)
+    this._tableId.set(table.id)
+    this._tableNumber.set(table.number)
+  }
+
+  /** Vacía el carrito pero conserva la mesa elegida para poder seguir pidiendo. */
   clear(): void {
     this._items.set([])
     this._restaurantId.set(null)
+  }
+
+  /** Vacía el carrito y olvida la mesa. */
+  reset(): void {
+    this.clear()
+    this._tableRestaurantId.set(null)
+    this._tableId.set(null)
+    this._tableNumber.set(null)
   }
 }

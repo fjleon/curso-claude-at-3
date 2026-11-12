@@ -17,6 +17,7 @@ Terminología del dominio y conceptos técnicos utilizados en el proyecto Restte
 | **DishIngredient** | Relación entre un plato y un ingrediente, con la cantidad necesaria. |
 | **Order** | Pedido realizado por un cliente. Contiene ítems (platos) y está asociado a un restaurante. |
 | **OrderItem** | Línea de un pedido: un plato con cantidad, notas opcionales y estado. |
+| **Mesa (Table)** | Mesa física de un restaurante. Tiene número (único en el restaurante), descripción opcional, capacidad y estado. Se guarda en `restaurant_tables`. Un pedido puede referenciarla con `tableId`. |
 
 Dos particularidades del modelo que conviene tener presentes:
 
@@ -43,6 +44,16 @@ El valor almacenado es `manager`; "gerente" es solo su traducción en la interfa
 | **preparando** | Ítem siendo preparado en cocina. | cocinero |
 | **listo** | Ítem preparado, listo para servir. | cocinero |
 | **entregado** | Ítem entregado al cliente. Desaparece de las vistas activas. | camarero |
+
+### Estados de Mesa
+
+| Estado | Descripción | Quién lo cambia |
+| --- | --- | --- |
+| **libre** | Mesa disponible. Es el estado inicial. | — (estado inicial); el personal puede volver a ponerla libre |
+| **ocupada** | Mesa en uso. Es el único estado que permite asociarle pedidos. | cliente (al ocuparla) o personal (admin, manager, camarero, cocinero) |
+| **reservada** | Mesa apartada; no aparece como disponible para clientes. | admin, manager, camarero, cocinero |
+
+**Ocupar mesa:** acción del cliente que, tras indicar el número de personas y elegir una mesa libre con capacidad suficiente, la pasa de `libre` a `ocupada` (`POST .../public/restaurants/:restaurantId/tables/:id/occupy`). Es atómica: si dos clientes intentan ocupar la misma mesa, solo uno lo consigue y el otro recibe 409. Una mesa no se puede borrar mientras está `ocupada`.
 
 ### Categorías de Platos
 

@@ -164,7 +164,7 @@ de las mesas ocupadas.
 - [x] `PATCH .../tables/:id/status` con `{ status: "reservada" }` devuelve 200 y con `{ status: "rota" }` devuelve 400.
 - [x] Dado un cliente logueado, `GET /api/v1/public/restaurants/rest-1/tables?people=3` devuelve solo mesas `libre` con `capacity >= 3`, ordenadas por capacidad; sin token devuelve 401 y con `people=0` devuelve 400.
 - [x] `POST .../tables/:id/occupy` sobre una mesa libre devuelve 200 y la deja `ocupada`; una segunda llamada devuelve 409.
-- [ ] En `web-clientes`, al pulsar un restaurante se pide el nº de personas, se listan solo las mesas válidas, al continuar se va a la carta y el pedido creado tiene `tableId` de esa mesa. — *pendiente de prueba manual en navegador: verificado solo con el build de Angular y revisión del código contra el contrato.*
+- [x] En `web-clientes`, al pulsar un restaurante se pide el nº de personas, se listan solo las mesas válidas, al continuar se va a la carta y el pedido creado tiene `tableId` de esa mesa. — verificado con Playwright (`packages/web-clientes/e2e/cliente-mesa-pedido.spec.ts`, vídeo en `e2e/videos/cliente-mesa-pedido.webm`).
 - [ ] En `web-admin` se pueden crear, listar, editar y borrar mesas desde el dashboard del restaurante. — *pendiente de prueba manual en navegador: verificado solo con el build de Angular y revisión del código contra el contrato.*
 - [ ] En `web-empleados`, `/mesas` muestra todas las mesas con su estado, permite cambiarlo y en las ocupadas muestra sus pedidos activos (se refresca cada 30 s). — *pendiente de prueba manual en navegador: verificado solo con el build de Angular y revisión del código contra el contrato.*
 - [x] Tras `npm run seed`, `rest-1` tiene 6 mesas y el pedido de ejemplo aparece en la mesa nº 5.

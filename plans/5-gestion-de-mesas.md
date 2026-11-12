@@ -105,51 +105,51 @@ de las mesas ocupadas.
 
 **API — dominio y persistencia**
 
-- [ ] **T1** — Test + implementación de `table.model.ts`: interfaz `Table` (`id`, `restaurantId`, `number`, `description: string | null`, `capacity`, `status`, `createdAt`, `updatedAt`) y `normalizeTableStatus()` (acepta `libre`/`ocupada`/`reservada`, normaliza mayúsculas y espacios, lanza `InvalidTableStatusError`) (`models/table.model.ts`, `models/table.model.test.ts`) · ~8 min
-- [ ] **T2** — Añadir los errores de mesa a `DomainErrors.ts` (mensajes en español) y en `errorHandler.ts` mapear `TableNotFoundError` a 404 y crear `CONFLICT_ERRORS` (`DuplicatedTableNumberError`, `TableNotAvailableError`, `TableOccupiedError`) → 409 · ~7 min
-- [ ] **T3** — Migración `CREATE TABLE IF NOT EXISTS restaurant_tables (id, restaurant_id, number INTEGER, description, capacity INTEGER, status TEXT DEFAULT 'libre', created_at, updated_at, UNIQUE(restaurant_id, number), FK restaurants)` en `database.ts` · ~5 min
-- [ ] **T4** — Test de integración (rojo) de `SqliteTableRepository`: guardar/buscar por id, listar por restaurante ordenado por número, actualizar, borrar (`repositories/table.repository.test.ts`) · ~8 min
-- [ ] **T5** — Implementar interfaz `TableRepository` y `SqliteTableRepository` (`findById`, `findByRestaurantId`, `findByNumber`, `save`, `delete`) con alias camelCase en el SQL hasta poner T4 en verde (`repositories/table.repository.ts`) · ~10 min
-- [ ] **T6** — Tests + implementación de `findAvailable(restaurantId, minCapacity)` y `occupyIfFree(id)` (UPDATE condicionado a `status = 'libre'` que devuelve `true/false` según `changes`) (`table.repository.ts`, `table.repository.test.ts`) · ~10 min
-- [ ] **T7** — `MockTableRepository` en memoria con la misma interfaz (`repositories/mocks/MockTableRepository.ts`) · ~5 min
+- [x] **T1** — Test + implementación de `table.model.ts`: interfaz `Table` (`id`, `restaurantId`, `number`, `description: string | null`, `capacity`, `status`, `createdAt`, `updatedAt`) y `normalizeTableStatus()` (acepta `libre`/`ocupada`/`reservada`, normaliza mayúsculas y espacios, lanza `InvalidTableStatusError`) (`models/table.model.ts`, `models/table.model.test.ts`) · ~8 min
+- [x] **T2** — Añadir los errores de mesa a `DomainErrors.ts` (mensajes en español) y en `errorHandler.ts` mapear `TableNotFoundError` a 404 y crear `CONFLICT_ERRORS` (`DuplicatedTableNumberError`, `TableNotAvailableError`, `TableOccupiedError`) → 409 · ~7 min
+- [x] **T3** — Migración `CREATE TABLE IF NOT EXISTS restaurant_tables (id, restaurant_id, number INTEGER, description, capacity INTEGER, status TEXT DEFAULT 'libre', created_at, updated_at, UNIQUE(restaurant_id, number), FK restaurants)` en `database.ts` · ~5 min
+- [x] **T4** — Test de integración (rojo) de `SqliteTableRepository`: guardar/buscar por id, listar por restaurante ordenado por número, actualizar, borrar (`repositories/table.repository.test.ts`) · ~8 min
+- [x] **T5** — Implementar interfaz `TableRepository` y `SqliteTableRepository` (`findById`, `findByRestaurantId`, `findByNumber`, `save`, `delete`) con alias camelCase en el SQL hasta poner T4 en verde (`repositories/table.repository.ts`) · ~10 min
+- [x] **T6** — Tests + implementación de `findAvailable(restaurantId, minCapacity)` y `occupyIfFree(id)` (UPDATE condicionado a `status = 'libre'` que devuelve `true/false` según `changes`) (`table.repository.ts`, `table.repository.test.ts`) · ~10 min
+- [x] **T7** — `MockTableRepository` en memoria con la misma interfaz (`repositories/mocks/MockTableRepository.ts`) · ~5 min
 
 **API — servicio**
 
-- [ ] **T8** — Tests + `TableService.create()`: número entero > 0, capacidad entera > 0, descripción opcional, estado inicial `libre`, número no repetido en el restaurante (`DuplicatedTableNumberError`) (`services/table.service.ts`, `.test.ts`) · ~10 min
-- [ ] **T9** — Tests + `update()` (404 si no existe, misma validación, número único excluyendo la propia mesa) y `findById` / `findByRestaurantId` · ~8 min
-- [ ] **T10** — Tests + `delete()` (404 si no existe; `TableOccupiedError` si está `ocupada`) y `changeStatus()` (valida con `normalizeTableStatus`) · ~8 min
-- [ ] **T11** — Tests + `findAvailable(restaurantId, people)` (`InvalidPeopleError` si no es entero > 0) y `occupy(restaurantId, id)` (404 si no existe o es de otro restaurante; `TableNotAvailableError` si `occupyIfFree` devuelve `false`) · ~10 min
+- [x] **T8** — Tests + `TableService.create()`: número entero > 0, capacidad entera > 0, descripción opcional, estado inicial `libre`, número no repetido en el restaurante (`DuplicatedTableNumberError`) (`services/table.service.ts`, `.test.ts`) · ~10 min
+- [x] **T9** — Tests + `update()` (404 si no existe, misma validación, número único excluyendo la propia mesa) y `findById` / `findByRestaurantId` · ~8 min
+- [x] **T10** — Tests + `delete()` (404 si no existe; `TableOccupiedError` si está `ocupada`) y `changeStatus()` (valida con `normalizeTableStatus`) · ~8 min
+- [x] **T11** — Tests + `findAvailable(restaurantId, people)` (`InvalidPeopleError` si no es entero > 0) y `occupy(restaurantId, id)` (404 si no existe o es de otro restaurante; `TableNotAvailableError` si `occupyIfFree` devuelve `false`) · ~10 min
 
 **API — HTTP y datos**
 
-- [ ] **T12** — `TableController` (`create`, `getAll`, `getById`, `update`, `delete`, `changeStatus`, `getAvailable`, `occupy`, `toJSON`) usando `next(error)` (`controllers/table.controller.ts`) · ~10 min
-- [ ] **T13** — `table.routes.ts` (`Router({ mergeParams: true })`, `authenticate` + `authorize` por rol) y `table.public.routes.ts` (`authenticate`); registrarlos en `app.ts` bajo `/api/v1/restaurants/:restaurantId/tables` y `/api/v1/public/restaurants/:restaurantId/tables` · ~8 min
-- [ ] **T14** — Seed: 6 mesas en `rest-1` (capacidades 2, 2, 4, 4, 6, 8; la nº 5 `ocupada`) y 3 en `rest-2` con ids fijos (`INSERT OR IGNORE`); el pedido de ejemplo usa el id de la mesa nº 5 en vez de `'5'` (`scripts/seed.ts`) · ~7 min
-- [ ] **T15** — Ejecutar `npm test` y probar a mano con curl/REST client los endpoints (CRUD como admin, 403 como cocinero en POST, disponibles y ocupar como cliente, doble ocupación → 409) · ~8 min
+- [x] **T12** — `TableController` (`create`, `getAll`, `getById`, `update`, `delete`, `changeStatus`, `getAvailable`, `occupy`, `toJSON`) usando `next(error)` (`controllers/table.controller.ts`) · ~10 min
+- [x] **T13** — `table.routes.ts` (`Router({ mergeParams: true })`, `authenticate` + `authorize` por rol) y `table.public.routes.ts` (`authenticate`); registrarlos en `app.ts` bajo `/api/v1/restaurants/:restaurantId/tables` y `/api/v1/public/restaurants/:restaurantId/tables` · ~8 min
+- [x] **T14** — Seed: 6 mesas en `rest-1` (capacidades 2, 2, 4, 4, 6, 8; la nº 5 `ocupada`) y 3 en `rest-2` con ids fijos (`INSERT OR IGNORE`); el pedido de ejemplo usa el id de la mesa nº 5 en vez de `'5'` (`scripts/seed.ts`) · ~7 min
+- [x] **T15** — Ejecutar `npm test` y probar a mano con curl/REST client los endpoints (CRUD como admin, 403 como cocinero en POST, disponibles y ocupar como cliente, doble ocupación → 409) · ~8 min
 
-- [ ] **T15b** — Tests + validación en `OrderService.create()` (inyectando `TableRepository`): si llega `tableId`, la mesa debe existir, pertenecer a `restaurantId` y estar `ocupada`; si no, error de dominio (el controlador actual responde 400). Composición en `order.routes.ts` (`services/order.service.ts`, `.test.ts`) · ~10 min
+- [x] **T15b** — Tests + validación en `OrderService.create()` (inyectando `TableRepository`): si llega `tableId`, la mesa debe existir, pertenecer a `restaurantId` y estar `ocupada`; si no, error de dominio (el controlador actual responde 400). Composición en `order.routes.ts` (`services/order.service.ts`, `.test.ts`) · ~10 min
 
 **web-admin**
 
-- [ ] **T16** — `features/tables/models/table.model.ts`, `services/table.service.ts` (HttpClient a `/api/v1/restaurants/:id/tables`) y `store/table.store.ts` (signals privadas + `asReadonly()`, `firstValueFrom`) siguiendo `ingredients` · ~10 min
-- [ ] **T17** — Página `table-list` (tabla con número, descripción, capacidad, estado como badge, editar y borrar con confirmación y error de la API visible) · ~10 min
-- [ ] **T18** — Página `table-form` (alta/edición; número, descripción, capacidad, estado; validación en cliente) · ~10 min
-- [ ] **T19** — `tables.routes.ts`, ruta hija `tables` en `app.routes.ts` y tarjeta «Mesas» en el dashboard del restaurante; `npm run build -w @resttek/web-admin` · ~7 min
+- [x] **T16** — `features/tables/models/table.model.ts`, `services/table.service.ts` (HttpClient a `/api/v1/restaurants/:id/tables`) y `store/table.store.ts` (signals privadas + `asReadonly()`, `firstValueFrom`) siguiendo `ingredients` · ~10 min
+- [x] **T17** — Página `table-list` (tabla con número, descripción, capacidad, estado como badge, editar y borrar con confirmación y error de la API visible) · ~10 min
+- [x] **T18** — Página `table-form` (alta/edición; número, descripción, capacidad, estado; validación en cliente) · ~10 min
+- [x] **T19** — `tables.routes.ts`, ruta hija `tables` en `app.routes.ts` y tarjeta «Mesas» en el dashboard del restaurante; `npm run build -w @resttek/web-admin` · ~7 min
 
 **web-empleados**
 
-- [ ] **T20** — `features/tables/models`, `services/table.service.ts` (listar y `PATCH status`) y `store/table.store.ts` con polling de 30 s (`startPolling`/`stopPolling`, como `OrderStore`) · ~10 min
-- [ ] **T21** — Página `mesas`: rejilla de mesas coloreada por estado y selector para cambiar el estado · ~10 min
-- [ ] **T22** — En `mesas`, para cada mesa ocupada, listar los pedidos activos de `OrderStore` cuyo `tableId` coincide (platos y estado de cada unidad) · ~8 min
-- [ ] **T23** — Ruta `/mesas`, `canSeeMesas` (admin, manager, camarero) y enlace en el menú lateral; `npm run build -w @resttek/web-empleados` · ~6 min
+- [x] **T20** — `features/tables/models`, `services/table.service.ts` (listar y `PATCH status`) y `store/table.store.ts` con polling de 30 s (`startPolling`/`stopPolling`, como `OrderStore`) · ~10 min
+- [x] **T21** — Página `mesas`: rejilla de mesas coloreada por estado y selector para cambiar el estado · ~10 min
+- [x] **T22** — En `mesas`, para cada mesa ocupada, listar los pedidos activos de `OrderStore` cuyo `tableId` coincide (platos y estado de cada unidad) · ~8 min
+- [x] **T23** — Ruta `/mesas`, `canSeeMesas` (admin, manager, camarero) y enlace en el menú lateral; `npm run build -w @resttek/web-empleados` · ~6 min
 
 **web-clientes**
 
-- [ ] **T24** — `core/models/table.model.ts` y `core/services/table.service.ts` (`getAvailable(restaurantId, people)`, `occupy(restaurantId, tableId)`) · ~6 min
-- [ ] **T25** — `CartStore`: signals `tableId`/`tableNumber`, `setTable(restaurantId, table)` (si cambia de restaurante vacía el carrito), `clear()` conserva la mesa y nuevo `reset()`; `OrderService.createOrder` envía `tableId` · ~8 min
-- [ ] **T26** — `SelectTableComponent`: input de nº de personas, botón «Buscar mesas», lista de mesas disponibles seleccionables y «Continuar» (ocupa, guarda en `CartStore` y navega a la carta; si 409 avisa y recarga la lista) · ~10 min
-- [ ] **T27** — Ruta `restaurants/:id/table`, enlace desde `restaurant-list` a ese paso y redirección desde `restaurant-menu` si no hay mesa del restaurante en `CartStore` · ~7 min
-- [ ] **T28** — Mostrar «Mesa N» en el carrito y la carta; `npm run build -w @resttek/web-clientes` · ~6 min
+- [x] **T24** — `core/models/table.model.ts` y `core/services/table.service.ts` (`getAvailable(restaurantId, people)`, `occupy(restaurantId, tableId)`) · ~6 min
+- [x] **T25** — `CartStore`: signals `tableId`/`tableNumber`, `setTable(restaurantId, table)` (si cambia de restaurante vacía el carrito), `clear()` conserva la mesa y nuevo `reset()`; `OrderService.createOrder` envía `tableId` · ~8 min
+- [x] **T26** — `SelectTableComponent`: input de nº de personas, botón «Buscar mesas», lista de mesas disponibles seleccionables y «Continuar» (ocupa, guarda en `CartStore` y navega a la carta; si 409 avisa y recarga la lista) · ~10 min
+- [x] **T27** — Ruta `restaurants/:id/table`, enlace desde `restaurant-list` a ese paso y redirección desde `restaurant-menu` si no hay mesa del restaurante en `CartStore` · ~7 min
+- [x] **T28** — Mostrar «Mesa N» en el carrito y la carta; `npm run build -w @resttek/web-clientes` · ~6 min
 
 **Cierre**
 

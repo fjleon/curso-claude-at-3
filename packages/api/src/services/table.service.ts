@@ -9,7 +9,9 @@ import {
     InvalidTableNumberError,
     RestaurantNotFoundError,
     TableNotFoundError,
-    TableOccupiedError
+    TableOccupiedError,
+    InvalidPeopleError,
+    TableNotAvailableError
 } from '@errors/DomainErrors.js'
 
 export interface CreateTableDTO {
@@ -107,6 +109,19 @@ export class TableService {
         return updated
     }
 
+    async findAvailable(restaurantId: string, people: unknown): Promise<Table[]> {
+        return this.tableRepository.findAvailable(restaurantId, this.parsePeople(people))
+    }
+
+    async occupy(restaurantId: string, id: string): Promise<Table> {
+        await this.findById(restaurantId, id)
+        const occupied = await this.tableRepository.occupyIfFree(id)
+        if (!occupied) {
+            throw new TableNotAvailableError()
+        }
+        return this.findById(restaurantId, id)
+    }
+
     async findById(restaurantId: string, id: string): Promise<Table> {
         const table = await this.tableRepository.findById(id)
         if (!table || table.restaurantId !== restaurantId) {
@@ -131,6 +146,14 @@ export class TableService {
             throw new InvalidCapacityError()
         }
         return value
+    }
+
+    private parsePeople(value: unknown): number {
+        const parsed = typeof value === 'string' && /^\d+$/.test(value.trim()) ? Number(value.trim()) : value
+        if (!this.isPositiveInteger(parsed)) {
+            throw new InvalidPeopleError()
+        }
+        return parsed
     }
 
     private isPositiveInteger(value: unknown): value is number {

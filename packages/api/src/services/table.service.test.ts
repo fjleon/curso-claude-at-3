@@ -9,7 +9,9 @@ import {
     InvalidTableStatusError,
     RestaurantNotFoundError,
     TableNotFoundError,
-    TableOccupiedError
+    TableOccupiedError,
+    InvalidPeopleError,
+    TableNotAvailableError
 } from '@errors/DomainErrors.js'
 import type { Restaurant } from '@models/restaurant.model.js'
 
@@ -209,6 +211,70 @@ describe('TableService', () => {
             const created = await service.create({ restaurantId: 'r2', number: 1, capacity: 2 })
             await expect(service.changeStatus('r1', 'no-existe', 'libre')).rejects.toThrow(TableNotFoundError)
             await expect(service.changeStatus('r1', created.id, 'libre')).rejects.toThrow(TableNotFoundError)
+        })
+    })
+
+    describe('findAvailable', () => {
+        beforeEach(async () => {
+            await service.create({ restaurantId: 'r1', number: 1, capacity: 2 })
+            await service.create({ restaurantId: 'r1', number: 4, capacity: 4 })
+            await service.create({ restaurantId: 'r1', number: 3, capacity: 4 })
+            await service.create({ restaurantId: 'r1', number: 2, capacity: 6 })
+            await service.create({ restaurantId: 'r1', number: 5, capacity: 8, status: 'ocupada' })
+            await service.create({ restaurantId: 'r1', number: 6, capacity: 8, status: 'reservada' })
+            await service.create({ restaurantId: 'r2', number: 1, capacity: 8 })
+        })
+
+        it('devuelve las mesas libres con capacidad suficiente por capacidad y número', async () => {
+            const tables = await service.findAvailable('r1', 3)
+            expect(tables.map(t => [t.number, t.capacity])).toEqual([[3, 4], [4, 4], [2, 6]])
+        })
+
+        it('acepta people como texto de la query string', async () => {
+            const tables = await service.findAvailable('r1', '5')
+            expect(tables.map(t => t.number)).toEqual([2])
+        })
+
+        it('devuelve [] si no hay mesas o el restaurante no existe', async () => {
+            expect(await service.findAvailable('r1', 20)).toEqual([])
+            expect(await service.findAvailable('no-existe', 1)).toEqual([])
+        })
+
+        it.each([0, -1, 2.5, '0', '2.5', 'abc', '', '  ', undefined, null, ['3']])(
+            'lanza InvalidPeopleError con people = %s',
+            async (people) => {
+                await expect(service.findAvailable('r1', people)).rejects.toThrow(InvalidPeopleError)
+            }
+        )
+    })
+
+    describe('occupy', () => {
+        it('ocupa una mesa libre y devuelve la mesa actualizada', async () => {
+            const created = await service.create({ restaurantId: 'r1', number: 1, capacity: 2 })
+
+            const occupied = await service.occupy('r1', created.id)
+
+            expect(occupied).toMatchObject({ id: created.id, number: 1, status: 'ocupada' })
+            expect((await tableRepo.findById(created.id))?.status).toBe('ocupada')
+        })
+
+        it.each(['ocupada', 'reservada'])('lanza TableNotAvailableError si la mesa está %s', async (status) => {
+            const created = await service.create({ restaurantId: 'r1', number: 1, capacity: 2, status })
+            await expect(service.occupy('r1', created.id)).rejects.toThrow(TableNotAvailableError)
+            expect((await tableRepo.findById(created.id))?.status).toBe(status)
+        })
+
+        it('solo una de dos ocupaciones de la misma mesa tiene éxito', async () => {
+            const created = await service.create({ restaurantId: 'r1', number: 1, capacity: 2 })
+            await service.occupy('r1', created.id)
+            await expect(service.occupy('r1', created.id)).rejects.toThrow(TableNotAvailableError)
+        })
+
+        it('lanza TableNotFoundError si no existe o es de otro restaurante', async () => {
+            const created = await service.create({ restaurantId: 'r2', number: 1, capacity: 2 })
+            await expect(service.occupy('r1', 'no-existe')).rejects.toThrow(TableNotFoundError)
+            await expect(service.occupy('r1', created.id)).rejects.toThrow(TableNotFoundError)
+            expect((await tableRepo.findById(created.id))?.status).toBe('libre')
         })
     })
 })

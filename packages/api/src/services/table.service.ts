@@ -1,0 +1,168 @@
+import { randomUUID } from 'crypto'
+import type { Table, TableStatusType } from '@models/table.model.js'
+import { normalizeTableStatus } from '@models/table.model.js'
+import type { TableRepository } from '@repositories/table.repository.js'
+import type { RestaurantRepository } from '@repositories/restaurant.repository.js'
+import {
+    DuplicatedTableNumberError,
+    InvalidCapacityError,
+    InvalidTableNumberError,
+    RestaurantNotFoundError,
+    TableNotFoundError,
+    TableOccupiedError,
+    InvalidPeopleError,
+    TableNotAvailableError
+} from '@errors/DomainErrors.js'
+
+export interface CreateTableDTO {
+    restaurantId: string
+    number: number
+    capacity: number
+    description?: string | null
+    status?: string
+}
+
+export interface UpdateTableDTO {
+    number: number
+    capacity: number
+    description?: string | null
+    status?: string
+}
+
+export class TableService {
+    constructor(
+        private readonly tableRepository: TableRepository,
+        private readonly restaurantRepository: RestaurantRepository
+    ) {}
+
+    async create(dto: CreateTableDTO): Promise<Table> {
+        const number = this.validateNumber(dto.number)
+        const capacity = this.validateCapacity(dto.capacity)
+        const status: TableStatusType = dto.status === undefined ? 'libre' : normalizeTableStatus(dto.status)
+
+        const restaurant = await this.restaurantRepository.findById(dto.restaurantId)
+        if (!restaurant) {
+            throw new RestaurantNotFoundError()
+        }
+
+        if (await this.tableRepository.findByNumber(dto.restaurantId, number)) {
+            throw new DuplicatedTableNumberError()
+        }
+
+        const now = new Date().toISOString()
+        const table: Table = {
+            id: randomUUID(),
+            restaurantId: dto.restaurantId,
+            number,
+            description: this.normalizeDescription(dto.description),
+            capacity,
+            status,
+            createdAt: now,
+            updatedAt: now
+        }
+
+        await this.tableRepository.save(table)
+        return table
+    }
+
+    async update(restaurantId: string, id: string, dto: UpdateTableDTO): Promise<Table> {
+        const existing = await this.findById(restaurantId, id)
+
+        const number = this.validateNumber(dto.number)
+        const capacity = this.validateCapacity(dto.capacity)
+        const status = dto.status === undefined ? existing.status : normalizeTableStatus(dto.status)
+
+        const sameNumber = await this.tableRepository.findByNumber(restaurantId, number)
+        if (sameNumber && sameNumber.id !== existing.id) {
+            throw new DuplicatedTableNumberError()
+        }
+
+        const updated: Table = {
+            ...existing,
+            number,
+            capacity,
+            description: this.normalizeDescription(dto.description),
+            status,
+            updatedAt: new Date().toISOString()
+        }
+
+        await this.tableRepository.save(updated)
+        return updated
+    }
+
+    async delete(restaurantId: string, id: string): Promise<void> {
+        const existing = await this.findById(restaurantId, id)
+        if (existing.status === 'ocupada') {
+            throw new TableOccupiedError()
+        }
+        await this.tableRepository.delete(id)
+    }
+
+    async changeStatus(restaurantId: string, id: string, status: string): Promise<Table> {
+        const existing = await this.findById(restaurantId, id)
+        const updated: Table = {
+            ...existing,
+            status: normalizeTableStatus(status),
+            updatedAt: new Date().toISOString()
+        }
+        await this.tableRepository.save(updated)
+        return updated
+    }
+
+    async findAvailable(restaurantId: string, people: unknown): Promise<Table[]> {
+        return this.tableRepository.findAvailable(restaurantId, this.parsePeople(people))
+    }
+
+    async occupy(restaurantId: string, id: string): Promise<Table> {
+        await this.findById(restaurantId, id)
+        const occupied = await this.tableRepository.occupyIfFree(id)
+        if (!occupied) {
+            throw new TableNotAvailableError()
+        }
+        return this.findById(restaurantId, id)
+    }
+
+    async findById(restaurantId: string, id: string): Promise<Table> {
+        const table = await this.tableRepository.findById(id)
+        if (!table || table.restaurantId !== restaurantId) {
+            throw new TableNotFoundError()
+        }
+        return table
+    }
+
+    async findByRestaurantId(restaurantId: string): Promise<Table[]> {
+        return this.tableRepository.findByRestaurantId(restaurantId)
+    }
+
+    private validateNumber(value: unknown): number {
+        if (!this.isPositiveInteger(value)) {
+            throw new InvalidTableNumberError()
+        }
+        return value
+    }
+
+    private validateCapacity(value: unknown): number {
+        if (!this.isPositiveInteger(value)) {
+            throw new InvalidCapacityError()
+        }
+        return value
+    }
+
+    private parsePeople(value: unknown): number {
+        const parsed = typeof value === 'string' && /^\d+$/.test(value.trim()) ? Number(value.trim()) : value
+        if (!this.isPositiveInteger(parsed)) {
+            throw new InvalidPeopleError()
+        }
+        return parsed
+    }
+
+    private isPositiveInteger(value: unknown): value is number {
+        return typeof value === 'number' && Number.isInteger(value) && value > 0
+    }
+
+    private normalizeDescription(value: unknown): string | null {
+        if (typeof value !== 'string') return null
+        const trimmed = value.trim()
+        return trimmed === '' ? null : trimmed
+    }
+}

@@ -4,9 +4,10 @@ import { OrderService } from '@services/order.service.js'
 import { SqliteOrderRepository } from '@repositories/order.repository.js'
 import { dbConfig } from '@config/database.js'
 import { authenticate } from '@shared/infrastructure/http/middlewares.js'
+import { tableRepository } from '@routes/table.dependencies.js'
 
 const orderRepository = new SqliteOrderRepository(dbConfig)
-const orderService = new OrderService(orderRepository)
+const orderService = new OrderService(orderRepository, tableRepository)
 const orderController = new OrderController(orderService)
 
 const router = Router()

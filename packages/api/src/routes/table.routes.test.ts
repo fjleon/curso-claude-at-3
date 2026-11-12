@@ -159,4 +159,29 @@ describe('Rutas de mesas (HTTP)', () => {
             expect(res.status).toBe(404)
         })
     })
+
+    describe('POST /orders con tableId', () => {
+        const order = (tableId: string | null) => ({ restaurantId: 'r1', tableId, items: [] })
+
+        it('acepta una mesa ocupada del restaurante (201)', async () => {
+            const tables = await request(app).get(PRIVATE).set('Authorization', token('admin'))
+            const occupied = tables.body.find((t: { status: string }) => t.status === 'ocupada')
+
+            const res = await request(app).post('/api/v1/orders').set('Authorization', token('cliente')).send(order(occupied.id))
+            expect(res.status).toBe(201)
+            expect(res.body.tableId).toBe(occupied.id)
+        })
+
+        it('rechaza con 400 una mesa inexistente o no ocupada', async () => {
+            const missing = await request(app).post('/api/v1/orders').set('Authorization', token('cliente')).send(order('no-existe'))
+            expect(missing.status).toBe(400)
+            expect(missing.body).toEqual({ error: 'Mesa no encontrada' })
+
+            const tables = await request(app).get(PRIVATE).set('Authorization', token('admin'))
+            const free = tables.body.find((t: { status: string }) => t.status === 'libre')
+            const notOccupied = await request(app).post('/api/v1/orders').set('Authorization', token('cliente')).send(order(free.id))
+            expect(notOccupied.status).toBe(400)
+            expect(notOccupied.body).toEqual({ error: 'La mesa no está ocupada' })
+        })
+    })
 })

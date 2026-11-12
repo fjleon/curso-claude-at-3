@@ -2,7 +2,14 @@ import { randomUUID } from 'crypto'
 import type { Order, OrderItem } from '@models/order.model.js'
 import { normalizeOrderStatus } from '@models/order.model.js'
 import type { OrderRepository } from '@repositories/order.repository.js'
-import { RestaurantIdRequiredError, OrderNotFoundError } from '@errors/DomainErrors.js'
+import type { TableRepository } from '@repositories/table.repository.js'
+import {
+    RestaurantIdRequiredError,
+    OrderNotFoundError,
+    TableNotFoundError,
+    TableNotInRestaurantError,
+    TableNotOccupiedError
+} from '@errors/DomainErrors.js'
 
 export interface CreateOrderRequest {
     restaurantId: string
@@ -16,11 +23,18 @@ export interface CreateOrderRequest {
 }
 
 export class OrderService {
-    constructor(private readonly orderRepository: OrderRepository) {}
+    constructor(
+        private readonly orderRepository: OrderRepository,
+        private readonly tableRepository: TableRepository
+    ) {}
 
     async create(request: CreateOrderRequest): Promise<Order> {
         if (!request.restaurantId || request.restaurantId.trim() === '') {
             throw new RestaurantIdRequiredError()
+        }
+
+        if (request.tableId) {
+            await this.assertTableAcceptsOrders(request.restaurantId, request.tableId)
         }
 
         const items: OrderItem[] = []
@@ -81,5 +95,18 @@ export class OrderService {
         item.status = normalizedStatus
 
         await this.orderRepository.updateItemStatus(orderId, itemId, normalizedStatus)
+    }
+
+    private async assertTableAcceptsOrders(restaurantId: string, tableId: string): Promise<void> {
+        const table = await this.tableRepository.findById(tableId)
+        if (!table) {
+            throw new TableNotFoundError()
+        }
+        if (table.restaurantId !== restaurantId) {
+            throw new TableNotInRestaurantError()
+        }
+        if (table.status !== 'ocupada') {
+            throw new TableNotOccupiedError()
+        }
     }
 }

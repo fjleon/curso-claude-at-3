@@ -210,3 +210,15 @@ export class TableOccupiedError extends AppError {
     super('No se puede borrar una mesa ocupada')
   }
 }
+
+export class TableNotInRestaurantError extends AppError {
+  constructor() {
+    super('La mesa no pertenece a este restaurante')
+  }
+}
+
+export class TableNotOccupiedError extends AppError {
+  constructor() {
+    super('La mesa no está ocupada')
+  }
+}

@@ -8,7 +8,8 @@ import {
     InvalidCapacityError,
     InvalidTableNumberError,
     RestaurantNotFoundError,
-    TableNotFoundError
+    TableNotFoundError,
+    TableOccupiedError
 } from '@errors/DomainErrors.js'
 
 export interface CreateTableDTO {
@@ -83,6 +84,25 @@ export class TableService {
             updatedAt: new Date().toISOString()
         }
 
+        await this.tableRepository.save(updated)
+        return updated
+    }
+
+    async delete(restaurantId: string, id: string): Promise<void> {
+        const existing = await this.findById(restaurantId, id)
+        if (existing.status === 'ocupada') {
+            throw new TableOccupiedError()
+        }
+        await this.tableRepository.delete(id)
+    }
+
+    async changeStatus(restaurantId: string, id: string, status: string): Promise<Table> {
+        const existing = await this.findById(restaurantId, id)
+        const updated: Table = {
+            ...existing,
+            status: normalizeTableStatus(status),
+            updatedAt: new Date().toISOString()
+        }
         await this.tableRepository.save(updated)
         return updated
     }

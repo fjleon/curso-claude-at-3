@@ -153,7 +153,7 @@ de las mesas ocupadas.
 
 **Cierre**
 
-- [ ] **T29** — Actualizar `docs/dominio/modelo-datos.md` (tabla `restaurant_tables`, relación con `orders.table_id`), `glosario.md` (Mesa y estados) y `docs/arquitectura/arquitectura-api.md` / `arquitectura-frontend.md` (endpoints, features nuevas, flujo del cliente) · ~10 min
+- [x] **T29** — Actualizar `docs/dominio/modelo-datos.md` (tabla `restaurant_tables`, relación con `orders.table_id`), `glosario.md` (Mesa y estados) y `docs/arquitectura/arquitectura-api.md` / `arquitectura-frontend.md` (endpoints, features nuevas, flujo del cliente) · ~10 min
 - [ ] **T30** — Comprobación final: `npm test`, `npx tsc --noEmit -p packages/api` y build de las tres apps; corregir avisos (no hay eslint/prettier configurados) · ~8 min
 
 ## Criterios de aceptación

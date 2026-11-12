@@ -12,6 +12,9 @@ import { OrderService } from '../../core/services/order.service'
     <div class="container">
       <div class="page-header">
         <h1>Tu pedido</h1>
+        @if (cartStore.tableNumber() !== null) {
+          <p>Mesa {{ cartStore.tableNumber() }}</p>
+        }
       </div>
 
       @if (cartStore.items().length === 0) {
@@ -45,6 +48,12 @@ import { OrderService } from '../../core/services/order.service'
 
           <aside class="order-summary card">
             <h3>Resumen</h3>
+            @if (cartStore.tableNumber() !== null) {
+              <div class="summary-row">
+                <span>Mesa</span>
+                <span>{{ cartStore.tableNumber() }}</span>
+              </div>
+            }
             <div class="summary-row">
               <span>Items ({{ cartStore.itemCount() }})</span>
               <span>{{ cartStore.total() | number:'1.2-2' }} €</span>
@@ -213,7 +222,9 @@ export class CartComponent {
         this.router.navigate(['/orders', order.id])
       },
       error: (err) => {
-        this.error.set('Error al confirmar el pedido. Inténtalo de nuevo.')
+        this.error.set(err?.status === 400 && err.error?.error
+          ? err.error.error
+          : 'Error al confirmar el pedido. Inténtalo de nuevo.')
         this.loading.set(false)
       }
     })

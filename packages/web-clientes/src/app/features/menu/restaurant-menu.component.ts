@@ -17,6 +17,9 @@ import { Restaurant } from '../../core/models/restaurant.model'
         <div>
           <a routerLink="/restaurants" class="back-link">← Volver a restaurantes</a>
           <h1>{{ restaurant()?.name || 'Cargando...' }}</h1>
+          @if (cartStore.tableNumber() !== null) {
+            <p class="table-info">Mesa {{ cartStore.tableNumber() }} · <a [routerLink]="['/restaurants', restaurant()?.id || cartStore.tableRestaurantId(), 'table']">Cambiar</a></p>
+          }
         </div>
       </div>
 
